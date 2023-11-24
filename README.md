@@ -18,3 +18,19 @@ After the course, I decided to take the project a few steps further and add the 
 <!-- 8. ability to draw lines and shapes, instead of points -->
 <!-- 9. geocode location from coordinates ("Run in Faro, Portugal") -->
 <!-- 10. display weather data for workout time and place -->
+<!-- 11. better explanation of how to use the app (in README and on UI) -->
+
+<!-- Figrure 2 shows the flowchart of the the complete functionality developed by Jonas and myself. -->
+<!-- <figure>
+  <img src="./complete-project-flowchart.png" alt="Complete Project Flowchart."/>
+  <figure-caption>
+    <p align=center><i>Figure 2. The Complete Project Flowchart.</i></p>
+  </figure-caption>
+</figure> -->
+
+[This link](https://mapty.netlify.app/) takes you to the final (deployed) version of Jonas' project.
+While [this link]() takes you to the final (deployed) version of my project.
+
+TODO:
+- create a complete flowchart
+- create a complete architecture 

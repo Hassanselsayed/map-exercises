@@ -1,5 +1,9 @@
 'use strict';
 
+import "./node_modules/leaflet/dist/leaflet.js";
+// import "./node_modules/leaflet-draw/dist/leaflet.draw.js";
+// import './node_modules/leaflet-draw/dist/leaflet.draw-src.js';
+
 // prettier-ignore
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
@@ -8,7 +12,6 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
-// import { Leaflet.draw } "leaflet-draw/dist/leaflet.draw.css";
 
 class Workout {
   date = new Date();
@@ -92,8 +95,17 @@ class App {
         // success callback function
         this.#loadMap.bind(this),
         // error callback function
+        // TODO: add the following logic into a separate function
         function() {
-          alert('Could not get your position')
+          // TODO: add a search (text) input to enter a city, then load the map using that city
+          const html = `
+            <li>
+              <h2>
+                Please choose a city where you want to log your workouts
+              </h2>
+            </li>
+          `
+          form.insertAdjacentHTML('afterend', html);
         }
       );
     };
