@@ -6,7 +6,7 @@ This project was (mostly) developed during a JavaScript course I took with [Jona
     <i>Figure 1. The Course Project Flowchart.</i>
   </figure-caption>
 </figure>
-
+<br>
 After the course, I decided to take the project a few steps further and add the following functionalities myself:
 <!-- 1. edit any workout -->
 <!-- 2. delete a workout -->
