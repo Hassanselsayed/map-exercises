@@ -1,7 +1,7 @@
 This project was primarily developed during a JavaScript course I took with [Jonas Schmedtmann](https://twitter.com/jonasschmedtman). He designed the project and I coded along with him during the course. Figure 1 shows the flowchart of what exactly was developed during the course.
 
 <figure>
-  <img src="./course-project-flowchart.png" alt="Course Project Flowchart."/>
+  <img src="./images/course-project-flowchart.png" alt="Course Project Flowchart."/>
   <figure-caption>
     <p align=center><i>Figure 1. The Course Project Flowchart (developed by Jonas).</i></p>
   </figure-caption>
@@ -23,7 +23,7 @@ After the course, I decided to take the project a few steps further and add the 
 
 Figrure 2 shows the flowchart of the the complete functionality developed by Jonas and myself.
 <figure>
-  <img src="./complete-project-flowchart.png" alt="Complete Project Flowchart."/>
+  <img src="./images/complete-project-flowchart.png" alt="Complete Project Flowchart."/>
   <figure-caption>
     <p align=center><i>Figure 2. The Complete Project Flowchart.</i></p>
   </figure-caption>
@@ -33,5 +33,4 @@ Figrure 2 shows the flowchart of the the complete functionality developed by Jon
 While [this link]() takes you to the final (deployed) version of my project.
 
 TODO:
-- create a complete flowchart
 - create a complete architecture 
