@@ -8,25 +8,26 @@ This project was primarily developed during a JavaScript course I took with [Jon
 </figure>
 
 After the course, I decided to take the project a few steps further and add the following functionalities myself:
-<!-- 1. edit any workout -->
-<!-- 2. delete a workout -->
-<!-- 3. delete all workouts -->
+1. edit a workout
+2. delete a workout
+3. delete all workouts
 <!-- 4. sort workouts by a certain fields (distance or duration) -->
 <!-- 5. rebuild running and cycling objects coming from local storage -->
 <!-- 6. better error and confirmation messages -->
-<!-- 7. ability to position map to position ALL workouts (important) -->
+<!-- 7. ability to position map to view all workouts (important) -->
 <!-- 8. ability to draw lines and shapes, instead of points -->
-<!-- 9. geocode location from coordinates ("Run in Faro, Portugal") -->
+<!-- 9. geocode location from coordinates and use it in workout description ("run in Toronto, Canada") -->
 <!-- 10. display weather data for workout time and place -->
-<!-- 11. better explanation of how to use the app (in README and on UI) -->
+<!-- 11. add city search input in case location was not granted -->
+<!-- 12. ability to delete/cancel forms -->
 
-<!-- Figrure 2 shows the flowchart of the the complete functionality developed by Jonas and myself. -->
-<!-- <figure>
+Figrure 2 shows the flowchart of the the complete functionality developed by Jonas and myself.
+<figure>
   <img src="./complete-project-flowchart.png" alt="Complete Project Flowchart."/>
   <figure-caption>
     <p align=center><i>Figure 2. The Complete Project Flowchart.</i></p>
   </figure-caption>
-</figure> -->
+</figure>
 
 [This link](https://mapty.netlify.app/) takes you to the final (deployed) version of Jonas' project.
 While [this link]() takes you to the final (deployed) version of my project.

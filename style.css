@@ -45,9 +45,9 @@ a:visited {
 
 /* SIDEBAR */
 .sidebar {
-  flex-basis: 50rem;
+  flex-basis: 55rem;
   background-color: var(--color-dark--1);
-  padding: 3rem 5rem 4rem 5rem;
+  padding: 3rem 4rem 4rem 4rem;
   display: flex;
   flex-direction: column;
 }
@@ -69,6 +69,15 @@ a:visited {
   width: 0;
 }
 
+.workouts__toolbox {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.workouts__toolbox--btn {
+  padding: 8px 12px;
+}
+
 .workout {
   background-color: var(--color-dark--2);
   border-radius: 5px;
@@ -87,10 +96,19 @@ a:visited {
   border-left: 5px solid var(--color-brand--1);
 }
 
+.workout__toolbox {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.workout__edit {
+  margin-right: 10px;
+}
+
 .workout__title {
   font-size: 1.7rem;
   font-weight: 600;
-  grid-column: 1 / -1;
+  grid-column: 1 / 4;
 }
 
 .workout__details {
@@ -149,7 +167,7 @@ a:visited {
 }
 
 .form__label {
-  flex: 0 0 50%;
+  flex: 0 0 45%;
   font-size: 1.5rem;
   font-weight: 600;
 }
