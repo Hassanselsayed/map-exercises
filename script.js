@@ -9,7 +9,9 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
-const deleteAll = document.querySelector('.delete-all');
+const deleteAll = document.querySelector('.workouts__delete-all');
+const inputSort = document.querySelector('.sort__input');
+const reverseSort = document.querySelector('.sort__reverse');
 
 class Workout {
   #date = new Date();
@@ -80,6 +82,8 @@ class App {
     form.addEventListener('submit', this.#newWorkout.bind(this));
     inputType.addEventListener('change', this.#toggleElevationFeild);
     containerWorkouts.addEventListener('click', this.#moveToPopup.bind(this));
+    inputSort.addEventListener('change', this.#sortWorkouts.bind(this));
+    reverseSort.addEventListener('click', this.#reverseSorting.bind(this));
     deleteAll.addEventListener('click', this.#reset.bind(this));
   }
 
@@ -190,7 +194,6 @@ class App {
     this.#workouts.push(workout);
 
     // render workout on map as a marker
-    console.log(workout);
     if (!this.#isEditing) this.#renderWorkoutMarker(workout);
     else this.#editWorkoutMarker(workout);
 
@@ -207,13 +210,11 @@ class App {
   };
   
   #renderWorkoutMarker(workout) {
-    console.log(1);
     const marker = L.marker(workout.coords).addTo(this.#map)
     this.#addPopup(marker, workout);
   }
 
   #editWorkoutMarker(workout) {
-    console.log(2);
     this.#map.eachLayer(layer => {
       if (layer._latlng && layer._latlng.lat === workout.coords[0] && layer._latlng.lng === workout.coords[1]) {
         layer.closePopup();
@@ -344,7 +345,7 @@ class App {
 
   #deleteWorkout(workout, all = false) {
     // remove workout from ui & list
-    document.getElementById(workout.id).remove();
+    this.#removeWorkoutFromUI(workout);
     this.#workouts = this.#workouts.filter(wo => wo.id !== workout.id);
 
     // remove existing map pin
@@ -358,6 +359,37 @@ class App {
 
     // reset local storage
     this.#setLocalStorage();
+  }
+
+  #removeWorkoutFromUI(workout) {
+    document.getElementById(workout.id).remove();
+  }
+
+  #sortWorkouts() {
+    this.#workouts
+      .sort((a, b) => a[inputSort.value] - b[inputSort.value])
+      .forEach(workout => {
+        this.#removeWorkoutFromUI(workout);
+        this.#renderWorkout(workout);
+      });
+    
+    reverseSort.classList.remove('hidden');
+    reverseSort.classList.remove('flip');
+  }
+
+  #reverseSorting(e) {
+    if (inputSort.value) {
+      this.#workouts
+        .reverse()
+        .forEach(workout => {
+          this.#removeWorkoutFromUI(workout);
+          this.#renderWorkout(workout);
+        });
+      
+      console.log(e);
+      reverseSort.classList.toggle('flip');
+      reverseSort.style.transition = 'all 0.5s';
+    }
   }
 
   #setLocalStorage() {

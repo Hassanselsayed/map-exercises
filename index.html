@@ -23,8 +23,15 @@
     <div class="sidebar">
       <ul class="workouts">
         <li class="workouts__toolbox">
-          <button class="workouts__toolbox--btn sort">Sort</button>
-          <button class="workouts__toolbox--btn delete-all" title="Delete All Workouts">Delete All</button>
+          <div class="sort__toolbox">
+            <select class="sort__input">
+              <option value="" disabled selected>Sort By</option>
+              <option value="distance">Distance</option>
+              <option value="duration">Duraction</option>
+            </select>
+            <i class="fas fa-sort-amount-up sort__reverse hidden" title="Reverse sorting"></i>
+          </div>
+          <button class="workouts__delete-all" title="Delete All Workouts">Delete All</button>
         </li>
         <form class="form hidden">
           <div class="form__row">

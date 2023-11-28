@@ -74,7 +74,8 @@ a:visited {
   justify-content: space-between;
   margin-bottom: 15px;
 }
-.workouts__toolbox--btn {
+.workouts__delete-all,
+.sort__input {
   padding: 8px 12px;
 }
 
@@ -238,4 +239,21 @@ a:visited {
 }
 .cycling-popup .leaflet-popup-content-wrapper {
   border-left: 5px solid var(--color-brand--1);
+}
+
+.sort__toolbox {
+  display: flex;
+  align-items: center;
+}
+.sort__reverse {
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.sort__reverse.hidden {
+  display: none;
+}
+.flip {
+  transform: rotateX(180deg);
+  /* transition: all 1s; */
 }
