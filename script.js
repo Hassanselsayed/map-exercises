@@ -12,21 +12,21 @@ const inputElevation = document.querySelector('.form__input--elevation');
 const deleteAll = document.querySelector('.workouts__delete-all');
 const inputSort = document.querySelector('.sort__input');
 const reverseSort = document.querySelector('.sort__reverse');
+const viewAll = document.querySelector('.markers__view-all');
 
-class Workout {
-  #date = new Date();
-  id = (Date.now() + '').slice(-10);
-
-  constructor(coords, distance, duration) {
+class Workout {  
+  constructor(coords, distance, duration, date, id) {
     this.coords = coords; // [lat, long]
     this.distance = distance; // in km
     this.duration = duration; // in min
+    this.date = date;
+    this.id = id;
   }
   
   setDescription() {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     
-    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.#date.getMonth()]} ${this.#date.getDate()}`
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
   }
 }
 
@@ -34,8 +34,8 @@ class Running extends Workout {
   type = 'running';
 
 
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
+  constructor(coords, distance, duration, date, id, cadence) {
+    super(coords, distance, duration, date, id);
     this.cadence = cadence;
     this.calcPace();
     this.setDescription();
@@ -51,8 +51,8 @@ class Running extends Workout {
 class Cycling extends Workout {
   type = 'cycling';
   
-  constructor(coords, distance, duration, elevationGain) {
-    super(coords, distance, duration);
+  constructor(coords, distance, duration, date, id, elevationGain) {
+    super(coords, distance, duration, date, id);
     this.elevationGain = elevationGain;
     this.calcSpeed();
     this.setDescription();
@@ -78,6 +78,9 @@ class App {
     // Get user's position
     this.#getPosition();
 
+    // TODO: promisify loading map (preferably with async await), then view all markers after that
+    // this.#viewAllMarkers.call(this);
+
     // Attach event handlers
     form.addEventListener('submit', this.#newWorkout.bind(this));
     inputType.addEventListener('change', this.#toggleElevationFeild);
@@ -85,6 +88,7 @@ class App {
     inputSort.addEventListener('change', this.#sortWorkouts.bind(this));
     reverseSort.addEventListener('click', this.#reverseSorting.bind(this));
     deleteAll.addEventListener('click', this.#reset.bind(this));
+    viewAll.addEventListener('click', this.#viewAllMarkers.bind(this));
   }
 
   #getPosition() {
@@ -115,7 +119,7 @@ class App {
 
     // Leaflet library
     const coords = [latitude, longitude];
-    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+    this.#map = L.map('map', {zoomSnap: 0.1}).setView(coords, this.#mapZoomLevel);
 
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -166,6 +170,8 @@ class App {
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
+    const currentDate = new Date();
+    const id = (Date.now() + '').slice(-10);
 
     // check if data is valid
     // if workout is running, create running object
@@ -176,7 +182,7 @@ class App {
         return alert('Inputs have to be positive numbers!')
       }
 
-      workout = new Running([lat, lng], distance, duration, cadence);
+      workout = new Running([lat, lng], distance, duration, currentDate, id, cadence);
     }
     
     // if workout is cycling, create cycling object
@@ -187,7 +193,7 @@ class App {
         return alert('Inputs have to be positive numbers!')
       }
 
-      workout = new Cycling([lat, lng], distance, duration, elevation);
+      workout = new Cycling([lat, lng], distance, duration, currentDate, id, elevation);
     }    
     
     // add new object to workout array
@@ -386,7 +392,6 @@ class App {
           this.#renderWorkout(workout);
         });
       
-      console.log(e);
       reverseSort.classList.toggle('flip');
       reverseSort.style.transition = 'all 0.5s';
     }
@@ -400,14 +405,27 @@ class App {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
     if (!data) return;
-
-    this.#workouts = data;
-
-    this.#workouts.forEach(workout => {
-      this.#renderWorkout(workout);
+    
+    data.forEach(wo => {
+      let workout;
+      const { coords, distance, duration, date, id } = wo;
+      const dateObject = new Date(date);
+      if (wo.type === 'running') {
+        const { cadence } = wo;
+        workout = new Running(coords, distance, duration, dateObject, id, cadence);
+      } else {
+        const { elevationGain } = wo;
+        workout = new Cycling(coords, distance, duration, dateObject, id, elevationGain);
+      }
+      this.#workouts.push(workout);
+      this.#renderWorkout(wo);
     })
   }
 
+  #viewAllMarkers() {
+    const latLngs = this.#workouts.map(wo => wo.coords);
+    this.#map.fitBounds(latLngs, {padding: [90, 90]});
+  }
 
   #reset() {
     this.#workouts.forEach(workout => this.#deleteWorkout(workout, true));
@@ -419,10 +437,7 @@ const app = new App();
 
 
 // TODO: Extra features to consider
-// 4. sort workouts by a certain fields (distance or duration)
-// 5. rebuild running and cycling objects coming from local storage
 // 6. better error and confirmation messages
-// 7. ability to position map to position all workouts (important)
 // 8. ability to draw lines and shapes, instead of points
 // 9. geocode location from coordinates ("run in faro, portugal")
 // 10. display weather data for workout time and place

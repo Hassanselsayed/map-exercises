@@ -74,9 +74,14 @@ a:visited {
   justify-content: space-between;
   margin-bottom: 15px;
 }
+
 .workouts__delete-all,
+.markers__view-all,
 .sort__input {
   padding: 8px 12px;
+  border-radius: 3px;
+  border: none;
+  outline: none;
 }
 
 .workout {
@@ -245,9 +250,16 @@ a:visited {
   display: flex;
   align-items: center;
 }
+
+.workouts__delete-all,
+.sort__input,
+.markers__view-all,
+.sort__reverse {
+  cursor: pointer;
+}
+
 .sort__reverse {
   font-size: 20px;
-  cursor: pointer;
   margin-left: 5px;
 }
 .sort__reverse.hidden {
@@ -255,5 +267,4 @@ a:visited {
 }
 .flip {
   transform: rotateX(180deg);
-  /* transition: all 1s; */
 }
