@@ -23,10 +23,22 @@ class Workout {
     this.id = id;
   }
   
-  setDescription() {
+  async setDescription() {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     
-    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
+    try {
+      const [ lat, lng ] = this.coords;
+      const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`);
+      if (!resGeo.ok) throw new Error('Problem getting location data');
+      const data = await resGeo.json();
+      this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} in ${data.city}, ${data.state ? data.state : data.region} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
+
+      const hi = await fetch('https://countriesnow.space/api/v0.1/countries');
+      console.log(await hi.json());
+    } catch(err) {
+      this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
+      console.error(err)
+    }
   }
 }
 
@@ -38,7 +50,10 @@ class Running extends Workout {
     super(coords, distance, duration, date, id);
     this.cadence = cadence;
     this.calcPace();
-    this.setDescription();
+  }
+  
+  async init() {
+    await this.setDescription();
   }
   
   calcPace() {
@@ -55,7 +70,10 @@ class Cycling extends Workout {
     super(coords, distance, duration, date, id);
     this.elevationGain = elevationGain;
     this.calcSpeed();
-    this.setDescription();
+  }
+  
+  async init() {
+    await this.setDescription();
   }
   
   calcSpeed() {
@@ -73,14 +91,13 @@ class App {
   #mapEvent;
   #workouts = [];
   #isEditing = false;
+  #editingWorkoutTime;
 
   constructor() {
-    // Get user's position
-    this.#getPosition();
-
+    
     // TODO: promisify loading map (preferably with async await), then view all markers after that
     // this.#viewAllMarkers.call(this);
-
+    
     // Attach event handlers
     form.addEventListener('submit', this.#newWorkout.bind(this));
     inputType.addEventListener('change', this.#toggleElevationFeild);
@@ -90,12 +107,17 @@ class App {
     deleteAll.addEventListener('click', this.#reset.bind(this));
     viewAll.addEventListener('click', this.#viewAllMarkers.bind(this));
   }
-
-  #getPosition() {
+  
+  async init() {
+    // Get user's position
+    await this.#getPosition();
+  }
+  
+  async #getPosition() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         // success callback function
-        this.#loadMap.bind(this),
+        await this.#loadMap.bind(this),
         // error callback function
         // TODO: add the following logic into a separate function
         function() {
@@ -113,7 +135,7 @@ class App {
     };
   };
 
-  #loadMap(position) {
+  async #loadMap(position) {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
 
@@ -129,11 +151,7 @@ class App {
     this.#map.on('click', this.#showForm.bind(this));
 
     // Get data from local storage
-    this.#getLocalStorage();
-
-    this.#workouts.forEach(workout => {
-      this.#renderWorkoutMarker(workout);
-    })
+    await this.#getLocalStorage();
   };
 
   #showForm(mapE) {
@@ -159,7 +177,7 @@ class App {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   };
   
-  #newWorkout(e) {
+  async #newWorkout(e) {
     const validInputs = (...inputs) => inputs.every(input => Number.isFinite(input));
     const allPositive = (...inputs) => inputs.every(input => input > 0);
     e.preventDefault();
@@ -170,7 +188,7 @@ class App {
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
-    const currentDate = new Date();
+    const currentDate = this.#isEditing ? this.#editingWorkoutTime : new Date();
     const id = (Date.now() + '').slice(-10);
 
     // check if data is valid
@@ -192,10 +210,13 @@ class App {
       if (!validInputs(distance, duration, elevation) || !allPositive(distance, duration)) {
         return alert('Inputs have to be positive numbers!')
       }
-
+      
       workout = new Cycling([lat, lng], distance, duration, currentDate, id, elevation);
     }    
     
+    console.log(workout);
+    await workout.init();
+
     // add new object to workout array
     this.#workouts.push(workout);
 
@@ -217,6 +238,7 @@ class App {
   
   #renderWorkoutMarker(workout) {
     const marker = L.marker(workout.coords).addTo(this.#map)
+    console.log(this);
     this.#addPopup(marker, workout);
   }
 
@@ -243,6 +265,7 @@ class App {
   }
 
   #renderWorkout(workout) {
+    console.log(workout);
     let html = `
       <li class="workout workout--${workout.type}" id="${workout.id}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
@@ -337,6 +360,9 @@ class App {
         inputCadence.closest('.form__row').classList.add('form__row--hidden');
         inputElevation.value = workout.elevationGain;
       }
+
+      // preserve date of original workout
+      this.#editingWorkoutTime = new Date(workout.date);
       
       // delete workout
       this.#deleteWorkout.call(this, workout);
@@ -401,12 +427,12 @@ class App {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
 
-  #getLocalStorage() {
+  async #getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
     if (!data) return;
     
-    data.forEach(wo => {
+    await data.forEach(async wo => {
       let workout;
       const { coords, distance, duration, date, id } = wo;
       const dateObject = new Date(date);
@@ -417,9 +443,13 @@ class App {
         const { elevationGain } = wo;
         workout = new Cycling(coords, distance, duration, dateObject, id, elevationGain);
       }
+
+      await workout.init();
       this.#workouts.push(workout);
-      this.#renderWorkout(wo);
+      this.#renderWorkout(workout);
+      this.#renderWorkoutMarker(workout);
     })
+    console.log(this.#workouts);
   }
 
   #viewAllMarkers() {
@@ -434,14 +464,14 @@ class App {
 }
 
 const app = new App();
+await app.init();
 
 
 // TODO: Extra features to consider
 // 6. better error and confirmation messages
-// 8. ability to draw lines and shapes, instead of points
-// 9. geocode location from coordinates ("run in faro, portugal")
 // 10. display weather data for workout time and place
 // 11. add city search input in case location not granted
 // 12. better explanation of how to use the app (in readme and on ui/modal)
 // 13. fix styling
 // 14. ability to delete forms
+// add comments
