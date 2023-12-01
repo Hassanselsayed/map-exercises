@@ -22,6 +22,10 @@ class Workout {
     this.date = date;
     this.id = id;
   }
+
+  async init() {
+    await this.setDescription();
+  }
   
   async setDescription() {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -29,12 +33,12 @@ class Workout {
     try {
       const [ lat, lng ] = this.coords;
       const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`);
-      if (!resGeo.ok) throw new Error('Problem getting location data');
       const data = await resGeo.json();
+      if (!resGeo.ok || !data.city) throw new Error(`Couldn't get location data because of API calls limit`);
       this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} in ${data.city}, ${data.state ? data.state : data.region} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
 
-      const hi = await fetch('https://countriesnow.space/api/v0.1/countries');
-      console.log(await hi.json());
+      // const hi = await fetch('https://countriesnow.space/api/v0.1/countries');
+      // console.log(await hi.json());
     } catch(err) {
       this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
       console.error(err)
@@ -52,10 +56,6 @@ class Running extends Workout {
     this.calcPace();
   }
   
-  async init() {
-    await this.setDescription();
-  }
-  
   calcPace() {
     // min/km
     this.pace = this.duration / this.distance;
@@ -70,10 +70,6 @@ class Cycling extends Workout {
     super(coords, distance, duration, date, id);
     this.elevationGain = elevationGain;
     this.calcSpeed();
-  }
-  
-  async init() {
-    await this.setDescription();
   }
   
   calcSpeed() {
@@ -93,11 +89,7 @@ class App {
   #isEditing = false;
   #editingWorkoutTime;
 
-  constructor() {
-    
-    // TODO: promisify loading map (preferably with async await), then view all markers after that
-    // this.#viewAllMarkers.call(this);
-    
+  constructor() { 
     // Attach event handlers
     form.addEventListener('submit', this.#newWorkout.bind(this));
     inputType.addEventListener('change', this.#toggleElevationFeild);
@@ -139,7 +131,7 @@ class App {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
 
-    // Leaflet library
+    // leaflet library
     const coords = [latitude, longitude];
     this.#map = L.map('map', {zoomSnap: 0.1}).setView(coords, this.#mapZoomLevel);
 
@@ -147,11 +139,18 @@ class App {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.#map);
 
-    // Handling clicks on map
+    // handling clicks on map
     this.#map.on('click', this.#showForm.bind(this));
 
-    // Get data from local storage
+    // get data from local storage
     await this.#getLocalStorage();
+
+    // center map around all markers
+    this.#viewAllMarkers.call(this);
+
+    // Change UI
+    document.getElementsByClassName('app')[0].classList.remove('hidden');
+    document.getElementsByClassName('loader-container')[0].style.display = 'none';
   };
 
   #showForm(mapE) {
@@ -214,7 +213,6 @@ class App {
       workout = new Cycling([lat, lng], distance, duration, currentDate, id, elevation);
     }    
     
-    console.log(workout);
     await workout.init();
 
     // add new object to workout array
@@ -238,7 +236,6 @@ class App {
   
   #renderWorkoutMarker(workout) {
     const marker = L.marker(workout.coords).addTo(this.#map)
-    console.log(this);
     this.#addPopup(marker, workout);
   }
 
@@ -265,7 +262,6 @@ class App {
   }
 
   #renderWorkout(workout) {
-    console.log(workout);
     let html = `
       <li class="workout workout--${workout.type}" id="${workout.id}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
@@ -428,14 +424,15 @@ class App {
   }
 
   async #getLocalStorage() {
-    const data = JSON.parse(localStorage.getItem('workouts'));
+    const data = await JSON.parse(localStorage.getItem('workouts'));
 
     if (!data) return;
-    
-    await data.forEach(async wo => {
+
+    for (const wo of data) {
       let workout;
       const { coords, distance, duration, date, id } = wo;
       const dateObject = new Date(date);
+
       if (wo.type === 'running') {
         const { cadence } = wo;
         workout = new Running(coords, distance, duration, dateObject, id, cadence);
@@ -443,13 +440,12 @@ class App {
         const { elevationGain } = wo;
         workout = new Cycling(coords, distance, duration, dateObject, id, elevationGain);
       }
-
+  
       await workout.init();
       this.#workouts.push(workout);
       this.#renderWorkout(workout);
       this.#renderWorkoutMarker(workout);
-    })
-    console.log(this.#workouts);
+    }
   }
 
   #viewAllMarkers() {
@@ -472,6 +468,6 @@ await app.init();
 // 10. display weather data for workout time and place
 // 11. add city search input in case location not granted
 // 12. better explanation of how to use the app (in readme and on ui/modal)
-// 13. fix styling
+// 13. fix styling (responsive)
 // 14. ability to delete forms
 // add comments

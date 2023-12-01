@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/Hassanselsayed/map-exercises#readme",
   "dependencies": {
-    "leaflet": "^1.9.4",
-    "leaflet-draw": "^1.0.4"
+    "leaflet": "^1.9.4"
   }
 }

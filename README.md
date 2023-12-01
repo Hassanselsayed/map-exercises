@@ -13,13 +13,11 @@ After the course, I decided to take the project a few steps further and add the 
 3. delete all workouts
 4. sort workouts by certain fields (distance or duration)
 5. rebuild running and cycling objects coming from local storage
-6. ability to position map to view all workouts on click
+6. ability to position map to view all workouts (on load and on click)
 <!-- 7. better error handling and confirmation messages -->
-8. geocode location from coordinates and use it in workout description ("run in Toronto, Canada")
-<!-- 9. display weather data for workout time and place -->
+8. get location from map coordinates and use it in workout description ("run in Toronto, Canada")
 <!-- 10. add city search input in case location was not granted -->
 <!-- 11. ability to delete/cancel forms -->
-<!-- 12. position map to view all workouts on load -->
 
 Figrure 2 shows the flowchart of the complete functionalities developed by Jonas and myself.
 <figure>
