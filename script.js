@@ -13,6 +13,9 @@ const deleteAll = document.querySelector('.workouts__delete-all');
 const inputSort = document.querySelector('.sort__input');
 const reverseSort = document.querySelector('.sort__reverse');
 const viewAll = document.querySelector('.markers__view-all');
+const appEl = document.querySelector('.app');
+const loaderEl = document.querySelector('.loader-container');
+const workoutsToolbox = document.querySelector('.workouts__toolbox');
 
 class Workout {  
   constructor(coords, distance, duration, date, id) {
@@ -112,16 +115,19 @@ class App {
         await this.#loadMap.bind(this),
         // error callback function
         // TODO: add the following logic into a separate function
-        function() {
+        () => {
           // TODO: add a search (text) input to enter a city, then load the map using that city
           const html = `
-            <li>
-              <h2>
+            <li class="city-search">
+              <h2 class="city-search__title">
                 Please choose a city where you want to log your workouts
               </h2>
+              <input class="city-search__input" placeholder="Search for a city" />
             </li>
           `
           form.insertAdjacentHTML('afterend', html);
+          this.#showElement(appEl);
+          this.#hideElement(loaderEl);
         }
       );
     };
@@ -149,8 +155,17 @@ class App {
     this.#viewAllMarkers.call(this);
 
     // Change UI
-    document.getElementsByClassName('app')[0].classList.remove('hidden');
-    document.getElementsByClassName('loader-container')[0].style.display = 'none';
+
+    this.#showElement(appEl);
+    this.#hideElement(loaderEl);
+    this.#showElement(workoutsToolbox);
+  };
+  
+  #hideElement(el) {
+    el.classList.add('hidden');
+  };
+  #showElement(el) {
+    el.classList.remove('hidden');
   };
 
   #showForm(mapE) {
@@ -169,7 +184,7 @@ class App {
     setTimeout(() => {
       form.style.display = 'grid';
     }, 1000);
-  }
+  };
 
   #toggleElevationFeild() {
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
@@ -237,7 +252,7 @@ class App {
   #renderWorkoutMarker(workout) {
     const marker = L.marker(workout.coords).addTo(this.#map)
     this.#addPopup(marker, workout);
-  }
+  };
 
   #editWorkoutMarker(workout) {
     this.#map.eachLayer(layer => {
@@ -246,7 +261,7 @@ class App {
         this.#addPopup(layer, workout);
       }
     })
-  }
+  };
 
   #addPopup(layer, workout) {
     layer
@@ -394,6 +409,7 @@ class App {
   }
 
   #sortWorkouts() {
+    if (this.#workouts.length === 0) return;
     this.#workouts
       .sort((a, b) => a[inputSort.value] - b[inputSort.value])
       .forEach(workout => {
@@ -405,7 +421,8 @@ class App {
     reverseSort.classList.remove('flip');
   }
 
-  #reverseSorting(e) {
+  #reverseSorting() {
+    if (this.#workouts.length === 0) return;
     if (inputSort.value) {
       this.#workouts
         .reverse()
@@ -449,6 +466,7 @@ class App {
   }
 
   #viewAllMarkers() {
+    if (this.#workouts.length === 0) return;
     const latLngs = this.#workouts.map(wo => wo.coords);
     this.#map.fitBounds(latLngs, {padding: [90, 90]});
   }
