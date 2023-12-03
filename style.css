@@ -1,4 +1,4 @@
-@import "./node_modules/leaflet/dist/leaflet.css";
+@import './node_modules/leaflet/dist/leaflet.css';
 /* @import "./node_modules/leaflet-draw/dist/leaflet.draw.css"; */
 
 :root {
@@ -69,19 +69,15 @@ a:visited {
   width: 0;
 }
 
-.workouts__toolbox.hidden {
-  display: none;
-}
-
 .workouts__toolbox {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
 }
 
-.workouts__delete-all,
-.markers__view-all,
-.sort__input {
+input,
+select,
+button {
   padding: 8px 12px;
   border-radius: 3px;
   border: none;
@@ -283,9 +279,6 @@ a:visited {
   height: 120px;
   animation: spin 2s linear infinite;
 }
-.loader-container.hidden {
-  display: none;
-}
 .loader-container {
   position: absolute;
   top: 50%;
@@ -295,6 +288,20 @@ a:visited {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  color: red;
+}
+
+.loader-container.hidden,
+/* .city-search__button.hidden, */
+.workouts__toolbox.hidden {
+  display: none;
 }
