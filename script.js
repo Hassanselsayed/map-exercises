@@ -1,6 +1,8 @@
+// local modules
+import autocomplete from './autocomplete.js';
+
+// 3rd party modules
 import './node_modules/leaflet/dist/leaflet.js';
-// import "./node_modules/leaflet-draw/dist/leaflet.draw.js";
-// import './node_modules/leaflet-draw/dist/leaflet.draw-src.js';
 
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
@@ -126,85 +128,109 @@ class App {
   async #getPosition() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        // success callback function
+        // location granted callback function
         await this.#loadMap.bind(this),
-        // error callback function
-        // TODO: add the following logic into a separate function
-        () => {
-          // TODO: add a search (text) input to enter a city, then load the map using that city
-          const html = `
-            <li class="city-search">
-              <h2 class="city-search__title">
-                Please choose a city where you want to log your workouts
-              </h2>
-              <div class="city-search__container">
-                <input class="city-search__input" placeholder="Search for a city" />
-                <button class="city-search__button hidden">Go to city</button>
-              </div>
-            </li>
-          `;
-          form.insertAdjacentHTML('afterend', html);
-          this.#showElement(appEl);
-          this.#hideElement(loaderEl);
-
-          const citySearchBtn = document.querySelector('.city-search__button');
-          citySearchBtn.addEventListener(
-            'click',
-            this.#searchForCity.bind(this)
-          );
-        }
+        // location denied callback function
+        await this.#citySearchUi.bind(this)
       );
     }
   }
 
-  async #searchForCity() {
-    // hide go to city button
+  async #citySearchUi() {
+    const html = `
+      <li class="city-search">
+        <h2 class="city-search__title flex__space-between">
+          Please choose a city where you want to log your workouts
+          <i class="fas fa-info-circle" title="Please note that I'm using 2 different APIs for generating the city suggestions and searching for city coordinates, and they don't necessarily have the exact same cities. For example, you will find 'Toronto, AU' in the list of suggestions, but if you choose it, you won't be able to load it on the map."></i>
+        </h2>
+        <h4 class="city-search__sub-title">
+          Enter 3 characters for suggestions to appear
+        </h4>
+        <form class="city-search__form flex__space-between" autocomplete="off" action="">
+          <div class="autocomplete">
+            <input class="city-search__input" id="myInput" name="myCity" placeholder="Search for a city">
+          </div>
+          <button class="city-search__button" type="submit" disabled>Submit</button>
+        </form>
+      </li>
+    `;
+    form.insertAdjacentHTML('afterend', html);
+    this.#showElement(appEl);
+    this.#hideElement(loaderEl);
+    await this.#getAllCities();
+    autocomplete(document.getElementById('myInput'), this.#citySuggestions);
+
+    // change to form submit
+    document
+      .querySelector('.city-search__form')
+      .addEventListener('submit', this.#searchForCity.bind(this));
+  }
+
+  async #getAllCities() {
     // Get all countries
     const allCountries = await fetch(
       'https://countriesnow.space/api/v0.1/countries'
     );
     const countries = (await allCountries.json()).data;
 
-    // create an autocomplete list with `city, country` suggestions
+    // create an array of `city, country` strings to be used for autocomplete suggestions
+    // console.log(countries);
     countries.forEach(co =>
       co.cities.forEach(city =>
-        this.#citySuggestions.push(`${city}, ${co.country}`)
+        this.#citySuggestions.push(`${city}, ${co.iso2}`)
       )
     );
-    // localStorage.setItem('city-suggestions', JSON.stringify(this.#citySuggestions));
-    console.log(this.#citySuggestions);
+  }
 
-    // choosing a city makes it the input value
-    // add a close button to the search input to remove the selected option
-    // show go to city button
-    // click on button --> make sure one of autcomplete options are selected --> get city coords --> loadMap
+  async #searchForCity(e) {
+    // TODO: get city coords --> loadMap
+    e.preventDefault();
+    const searchButton = document.querySelector('.city-search__button');
+    searchButton.setAttribute('disabled', true);
+    searchButton.classList.remove('active');
 
-    const citySearchInput = document.querySelector('.city-search__input').value;
-    const moreCharacters = `<h3 class="city-search__error error"><em>**Please input at least 3 characters to search for a city**</em></h3>`;
-    const citySearch = document.querySelector('.city-search');
+    const citySearchInput = document.querySelector('.city-search__input');
+    const inputSplit = citySearchInput.value.split(', ');
+    const cityName = inputSplit[0];
+    const countryName = inputSplit[1];
+    console.log(cityName);
+    console.log(countryName);
+    // const citySearch = document.querySelector('.city-search');
 
-    // check if
-    if (citySearchInput.length < 3) {
-      citySearch.insertAdjacentHTML('afterend', moreCharacters);
-      return;
-    }
-    document.querySelector('.city-search__error')?.remove();
-
-    const url = `https://api.api-ninjas.com/v1/city?name=${citySearchInput}`;
+    const url = `https://api.api-ninjas.com/v1/city?country=${countryName}&&name=${cityName}&&limit=1`;
     const options = {
       method: 'GET',
       headers: {
         'X-Api-Key': 'AH29ePu1Mv1yF0PhthKyIw==R4U7iJjAMsZOnkPD',
       },
     };
+    console.log(url);
 
-    // try {
-    //   const response = await fetch(url, options);
-    //   const result = await response.text();
-    //   console.log(result);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    try {
+      const response = await fetch(url, options);
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(
+          `Sorry couldn't get city details, API calls limit reached.`
+        );
+      if (result.length === 0)
+        throw new Error(`Sorry couldn't find city, please choose another one.`);
+
+      await this.#loadMap({
+        coords: {
+          latitude: result[0].latitude,
+          longitude: result[0].longitude,
+        },
+      });
+
+      // TODO: hide city search
+      // add confirmation message
+    } catch (error) {
+      console.error(error);
+      // handle error
+    }
+
+    citySearchInput.value = '';
   }
 
   async #loadMap(position) {
@@ -633,7 +659,6 @@ await app.init();
 
 // TODO: Extra features to consider
 // better error and confirmation messages
-// add city search input in case location not granted
 // ability to delete forms
 // better explanation of how to use the app (in readme and on ui/modal)
 // fix styling (responsive)
@@ -641,3 +666,4 @@ await app.init();
 // reduce api calls (cache??)
 // beware of spamming api calls to crash app
 // organize code (add modules???)
+// remove all TODO:
