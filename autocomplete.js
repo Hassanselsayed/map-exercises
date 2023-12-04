@@ -43,7 +43,6 @@ function autocomplete(inp, arr) {
   // execute a function when someone writes in the text field:
   inp.addEventListener('input', function (e) {
     if (inp.value !== selectedCity) {
-      // TODO: transform following into its own function
       const searchButton = document.querySelector('.city-search__button');
       disableButton(searchButton);
       isCitySelected = false;

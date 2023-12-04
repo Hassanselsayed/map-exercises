@@ -44,7 +44,7 @@ a:visited {
 
 /* SIDEBAR */
 .sidebar {
-  flex-basis: 55rem;
+  flex-basis: 50rem;
   background-color: var(--color-dark--1);
   padding: 3rem;
   display: flex;
@@ -358,4 +358,12 @@ button {
 button[disabled],
 select[disabled] {
   cursor: initial;
+}
+
+.small-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

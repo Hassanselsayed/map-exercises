@@ -25,6 +25,7 @@ const viewAll = document.querySelector('.markers__view-all');
 const appEl = document.querySelector('.app');
 const loaderEl = document.querySelector('.loader-container');
 const workoutsToolbox = document.querySelector('.workouts__toolbox');
+const smallScreenEl = document.querySelector('.small-screen');
 
 class Workout {
   constructor(coords, distance, duration, date, id) {
@@ -55,21 +56,27 @@ class Workout {
       'December',
     ];
 
-    // before setting live, remove this and uncomment try/catch
-    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
-      months[this.date.getMonth()]
-    } ${this.date.getDate()}`;
-
-    // try {
-    //   const [ lat, lng ] = this.coords;
-    //   const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`);
-    //   const data = await resGeo.json();
-    //   if (!resGeo.ok || !data.city) throw new Error(`Couldn't get location data because of API calls limit`);
-    //   this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} in ${data.city}, ${data.state ? data.state : data.region} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
-    // } catch(err) {
-    //   this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
-    //   console.error(err);
-    // }
+    try {
+      const [lat, lng] = this.coords;
+      const resGeo = await fetch(
+        `https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`
+      );
+      const data = await resGeo.json();
+      if (!resGeo.ok || !data.city)
+        throw new Error(
+          `Couldn't get location data because of API calls limit`
+        );
+      this.description = `${this.type[0].toUpperCase()}${this.type.slice(
+        1
+      )} in ${data.city}, ${data.state ? data.state : data.region} on ${
+        months[this.date.getMonth()]
+      } ${this.date.getDate()}`;
+    } catch (err) {
+      this.description = `${this.type[0].toUpperCase()}${this.type.slice(
+        1
+      )} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+      console.error(err);
+    }
   }
 }
 
@@ -129,8 +136,15 @@ class App {
   }
 
   async init() {
+    if (screen.width <= 1000) {
+      removeElement(loaderEl);
+      removeElement(appEl);
+      showElement(smallScreenEl);
+      return;
+    }
     // Get user's position
     await this.#getPosition();
+    console.log(screen);
   }
 
   async #getPosition() {
@@ -670,13 +684,3 @@ class App {
 
 const app = new App();
 await app.init();
-
-// TODO: Extra features to consider
-// better error and confirmation messages
-// better explanation of how to use the app (in readme and on ui/modal)
-// fix styling (responsive)
-// add comments
-// reduce api calls (cache??)
-// beware of spamming api calls to crash app
-// organize code (add modules???)
-// remove all TODO:
