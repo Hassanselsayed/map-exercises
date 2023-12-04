@@ -28,7 +28,7 @@
         <ul class="workouts">
           <li class="workouts__toolbox flex__space-between hidden">
             <div class="sort__toolbox">
-              <select class="sort__input">
+              <select class="sort__input" disabled>
                 <option value="" disabled selected>Sort By</option>
                 <option value="distance">Distance</option>
                 <option value="duration">Duration</option>
@@ -38,10 +38,14 @@
                 title="Reverse sorting direction"
               ></i>
             </div>
-            <button class="workouts__delete-all" title="Delete All Workouts">
+            <button
+              class="workouts__delete-all"
+              title="Delete All Workouts"
+              disabled
+            >
               Delete All
             </button>
-            <button class="markers__view-all" title="View All Markers">
+            <button class="markers__view-all" title="View All Markers" disabled>
               View All
             </button>
           </li>
@@ -83,6 +87,7 @@
                 />
               </div>
               <button class="form__btn">OK</button>
+              <i class="fas fa-times form__close" title="Close form"></i>
             </form>
           </li>
         </ul>

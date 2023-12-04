@@ -1,5 +1,11 @@
 // local modules
 import autocomplete from './autocomplete.js';
+import {
+  enableButton,
+  disableButton,
+  removeElement,
+  showElement,
+} from './helpers.js';
 
 // 3rd party modules
 import './node_modules/leaflet/dist/leaflet.js';
@@ -11,6 +17,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const closeForm = document.querySelector('.form__close');
 const deleteAll = document.querySelector('.workouts__delete-all');
 const inputSort = document.querySelector('.sort__input');
 const reverseSort = document.querySelector('.sort__reverse');
@@ -118,6 +125,7 @@ class App {
     reverseSort.addEventListener('click', this.#reverseSorting.bind(this));
     deleteAll.addEventListener('click', this.#reset.bind(this));
     viewAll.addEventListener('click', this.#viewAllMarkers.bind(this));
+    closeForm.addEventListener('click', this.#hideForm.bind(this));
   }
 
   async init() {
@@ -131,12 +139,13 @@ class App {
         // location granted callback function
         await this.#loadMap.bind(this),
         // location denied callback function
-        await this.#citySearchUi.bind(this)
+        await this.#citySearchUI.bind(this)
       );
     }
   }
 
-  async #citySearchUi() {
+  async #citySearchUI() {
+    // create html for city search
     const html = `
       <li class="city-search">
         <h2 class="city-search__title flex__space-between">
@@ -154,27 +163,32 @@ class App {
         </form>
       </li>
     `;
+
+    // insert html inUI + show/hide relevant elements
     form.insertAdjacentHTML('afterend', html);
-    this.#showElement(appEl);
-    this.#hideElement(loaderEl);
+    showElement(appEl);
+    removeElement(loaderEl);
+
+    // method to get all cities
     await this.#getAllCities();
+
+    // function to generate autocomplete suggestions
     autocomplete(document.getElementById('myInput'), this.#citySuggestions);
 
-    // change to form submit
+    // attach event listener to city search form
     document
       .querySelector('.city-search__form')
       .addEventListener('submit', this.#searchForCity.bind(this));
   }
 
   async #getAllCities() {
-    // Get all countries
+    // get all countries
     const allCountries = await fetch(
       'https://countriesnow.space/api/v0.1/countries'
     );
     const countries = (await allCountries.json()).data;
 
     // create an array of `city, country` strings to be used for autocomplete suggestions
-    // console.log(countries);
     countries.forEach(co =>
       co.cities.forEach(city =>
         this.#citySuggestions.push(`${city}, ${co.iso2}`)
@@ -183,19 +197,15 @@ class App {
   }
 
   async #searchForCity(e) {
-    // TODO: get city coords --> loadMap
     e.preventDefault();
     const searchButton = document.querySelector('.city-search__button');
-    searchButton.setAttribute('disabled', true);
+    disableButton(searchButton);
     searchButton.classList.remove('active');
 
     const citySearchInput = document.querySelector('.city-search__input');
     const inputSplit = citySearchInput.value.split(', ');
     const cityName = inputSplit[0];
     const countryName = inputSplit[1];
-    console.log(cityName);
-    console.log(countryName);
-    // const citySearch = document.querySelector('.city-search');
 
     const url = `https://api.api-ninjas.com/v1/city?country=${countryName}&&name=${cityName}&&limit=1`;
     const options = {
@@ -204,14 +214,15 @@ class App {
         'X-Api-Key': 'AH29ePu1Mv1yF0PhthKyIw==R4U7iJjAMsZOnkPD',
       },
     };
-    console.log(url);
+
+    const citySearchEl = document.querySelector('.city-search');
 
     try {
       const response = await fetch(url, options);
       const result = await response.json();
       if (!response.ok)
         throw new Error(
-          `Sorry couldn't get city details, API calls limit reached.`
+          `Sorry couldn't get city details, API calls limit reached. Please refresh page and allow location access to use the app.`
         );
       if (result.length === 0)
         throw new Error(`Sorry couldn't find city, please choose another one.`);
@@ -223,11 +234,19 @@ class App {
         },
       });
 
-      // TODO: hide city search
-      // add confirmation message
+      // hide city search after map has loaded
+      removeElement(citySearchEl);
     } catch (error) {
-      console.error(error);
-      // handle error
+      // remove existing error message, if any
+      citySearchEl.querySelector('.error')?.remove();
+
+      // create error node
+      const errorNode = document.createElement('h3');
+      errorNode.classList.add('error');
+      errorNode.innerHTML = error;
+
+      // append error node
+      citySearchEl.appendChild(errorNode);
     }
 
     citySearchInput.value = '';
@@ -239,10 +258,7 @@ class App {
 
     // leaflet library
     const coords = [latitude, longitude];
-    this.#map = L.map('map', { zoomSnap: 0.1 }).setView(
-      coords,
-      this.#mapZoomLevel
-    );
+    this.#map = L.map('map', { zoomSnap: 0.1 });
 
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution:
@@ -255,21 +271,13 @@ class App {
     // get data from local storage
     await this.#getLocalStorage();
 
-    // center map around all markers
-    this.#viewAllMarkers.call(this);
-
     // Change UI
 
-    this.#showElement(appEl);
-    this.#hideElement(loaderEl);
-    this.#showElement(workoutsToolbox);
-  }
+    showElement(appEl);
+    removeElement(loaderEl);
+    showElement(workoutsToolbox);
 
-  #hideElement(el) {
-    el.classList.add('hidden');
-  }
-  #showElement(el) {
-    el.classList.remove('hidden');
+    this.#map.setView(coords, this.#mapZoomLevel);
   }
 
   #showForm(mapE) {
@@ -300,6 +308,7 @@ class App {
   }
 
   async #newWorkout(e) {
+    // validate input data
     const validInputs = (...inputs) =>
       inputs.every(input => Number.isFinite(input));
     const allPositive = (...inputs) => inputs.every(input => input > 0);
@@ -414,6 +423,11 @@ class App {
   }
 
   #renderWorkout(workout) {
+    // enable toolbox buttons
+    enableButton(deleteAll);
+    enableButton(viewAll);
+    enableButton(inputSort);
+
     let html = `
       <li class="workout workout--${workout.type}" id="${
       workout.id
@@ -549,7 +563,7 @@ class App {
 
   #deleteWorkout(workout, all = false) {
     // remove workout from ui & list
-    this.#removeWorkoutFromUI(workout);
+    removeElement(document.getElementById(workout.id));
     this.#workouts = this.#workouts.filter(wo => wo.id !== workout.id);
 
     // remove existing map pin
@@ -569,16 +583,12 @@ class App {
     this.#setLocalStorage();
   }
 
-  #removeWorkoutFromUI(workout) {
-    document.getElementById(workout.id).remove();
-  }
-
   #sortWorkouts() {
     if (this.#workouts.length === 0) return;
     this.#workouts
       .sort((a, b) => a[inputSort.value] - b[inputSort.value])
       .forEach(workout => {
-        this.#removeWorkoutFromUI(workout);
+        removeElement(document.getElementById(workout.id));
         this.#renderWorkout(workout);
       });
 
@@ -590,7 +600,7 @@ class App {
     if (this.#workouts.length === 0) return;
     if (inputSort.value) {
       this.#workouts.reverse().forEach(workout => {
-        this.#removeWorkoutFromUI(workout);
+        removeElement(document.getElementById(workout.id));
         this.#renderWorkout(workout);
       });
 
@@ -651,6 +661,10 @@ class App {
   #reset() {
     this.#workouts.forEach(workout => this.#deleteWorkout(workout, true));
     localStorage.removeItem('workouts');
+
+    disableButton(deleteAll);
+    disableButton(viewAll);
+    disableButton(inputSort);
   }
 }
 
@@ -659,7 +673,6 @@ await app.init();
 
 // TODO: Extra features to consider
 // better error and confirmation messages
-// ability to delete forms
 // better explanation of how to use the app (in readme and on ui/modal)
 // fix styling (responsive)
 // add comments

@@ -1,3 +1,5 @@
+import { enableButton, disableButton } from './helpers.js';
+
 // used to confirm that input.value equals a city from the array
 let selectedCity = '';
 // used to make sure there is a city selected from the array, not just typed into the input
@@ -43,8 +45,7 @@ function autocomplete(inp, arr) {
     if (inp.value !== selectedCity) {
       // TODO: transform following into its own function
       const searchButton = document.querySelector('.city-search__button');
-      searchButton.setAttribute('disabled', true);
-      searchButton.classList.remove('active');
+      disableButton(searchButton);
       isCitySelected = false;
     }
 
@@ -88,10 +89,9 @@ function autocomplete(inp, arr) {
           inp.value = selectedCity =
             this.getElementsByTagName('input')[0].value;
 
-          // enabled submit button
+          // enable submit button
           const searchButton = document.querySelector('.city-search__button');
-          searchButton.removeAttribute('disabled');
-          searchButton.classList.add('active');
+          enableButton(searchButton);
 
           closeAutocompleteList();
         });

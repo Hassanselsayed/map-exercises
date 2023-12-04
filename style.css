@@ -1,5 +1,4 @@
 @import './node_modules/leaflet/dist/leaflet.css';
-/* @import "./node_modules/leaflet-draw/dist/leaflet.draw.css"; */
 
 :root {
   --color-brand--1: #ffb545;
@@ -142,7 +141,7 @@ button {
   border-radius: 5px;
   padding: 1.5rem 2.75rem;
   margin-bottom: 1.75rem;
-
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 2.5rem;
@@ -193,6 +192,13 @@ button {
 
 .form__btn {
   display: none;
+}
+
+.form__close {
+  font-size: 15px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .copyright {
@@ -250,10 +256,11 @@ button {
 
 .workout,
 .autocomplete-items div,
-.city-search__button.active,
+.city-search__button,
 .workouts__delete-all,
 .sort__input,
 .markers__view-all,
+.form__close,
 .sort__reverse {
   cursor: pointer;
 }
@@ -316,7 +323,7 @@ button {
   border: 1px solid #d4d4d4;
   border-bottom: none;
   border-top: none;
-  z-index: 99;
+  z-index: 9999;
   /*position the autocomplete items to be the same width as the container:*/
   top: 100%;
   left: 0;
@@ -325,6 +332,7 @@ button {
 .autocomplete-items div {
   padding: 10px;
   border-bottom: 1px solid #d4d4d4;
+  background-color: var(--color-dark--1);
 }
 .autocomplete-active,
 .autocomplete-items div:hover {
@@ -340,4 +348,14 @@ button {
 }
 .city-search__sub-title {
   margin-bottom: 10px;
+}
+
+.workouts__confirmation-message {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+button[disabled],
+select[disabled] {
+  cursor: initial;
 }
