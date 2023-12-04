@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <!-- Google fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font awesome -->
+    <script
+      src="https://kit.fontawesome.com/5356eff725.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <link rel="stylesheet" href="style.css" />
+    <script defer type="module" src="script.js"></script>
+    <title>Map Exercises</title>
+  </head>
+  <body>
+    <div class="app hidden">
+      <div class="sidebar">
+        <ul class="workouts">
+          <li class="workouts__toolbox flex__space-between hidden">
+            <div class="sort__toolbox">
+              <select class="sort__input" disabled>
+                <option value="" disabled selected>Sort By</option>
+                <option value="distance">Distance</option>
+                <option value="duration">Duration</option>
+              </select>
+              <i
+                class="fas fa-sort-amount-up sort__reverse hidden"
+                title="Reverse sorting direction"
+              ></i>
+            </div>
+            <button
+              class="workouts__delete-all"
+              title="Delete All Workouts"
+              disabled
+            >
+              Delete All
+            </button>
+            <button class="markers__view-all" title="View All Markers" disabled>
+              View All
+            </button>
+          </li>
+          <li>
+            <form class="form workout__form hidden">
+              <div class="form__row">
+                <label class="form__label">Type</label>
+                <select class="form__input form__input--type">
+                  <option value="running">Running</option>
+                  <option value="cycling">Cycling</option>
+                </select>
+              </div>
+              <div class="form__row">
+                <label class="form__label">Distance</label>
+                <input
+                  class="form__input form__input--distance"
+                  placeholder="km"
+                />
+              </div>
+              <div class="form__row">
+                <label class="form__label">Duration</label>
+                <input
+                  class="form__input form__input--duration"
+                  placeholder="min"
+                />
+              </div>
+              <div class="form__row">
+                <label class="form__label">Cadence</label>
+                <input
+                  class="form__input form__input--cadence"
+                  placeholder="step/min"
+                />
+              </div>
+              <div class="form__row form__row--hidden">
+                <label class="form__label">Elev Gain</label>
+                <input
+                  class="form__input form__input--elevation"
+                  placeholder="meters"
+                />
+              </div>
+              <button class="form__btn">OK</button>
+              <i class="fas fa-times form__close" title="Close form"></i>
+            </form>
+          </li>
+        </ul>
+      </div>
+
+      <div id="map"></div>
+    </div>
+    <div class="loader-container">
+      <div class="loader"></div>
+    </div>
+    <h1 class="small-screen hidden">Please open app on a larger screen.</h1>
+  </body>
+</html>

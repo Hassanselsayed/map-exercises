@@ -1,0 +1,27 @@
+{
+  "name": "map-exercises",
+  "version": "1.0.0",
+  "description": "a web app to log your exercises onto a list and a map ",
+  "main": "script.js",
+  "scripts": {
+    "serve": "live-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hassanselsayed/map-exercises.git"
+  },
+  "keywords": [
+    "JS",
+    "OOP",
+    "Classes"
+  ],
+  "author": "Hassan Elsayed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hassanselsayed/map-exercises/issues"
+  },
+  "homepage": "https://github.com/Hassanselsayed/map-exercises#readme",
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  }
+}

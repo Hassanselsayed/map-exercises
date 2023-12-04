@@ -1,0 +1,369 @@
+@import './node_modules/leaflet/dist/leaflet.css';
+
+:root {
+  --color-brand--1: #ffb545;
+  --color-brand--2: #00c46a;
+
+  --color-dark--1: #2d3439;
+  --color-dark--2: #42484d;
+  --color-light--1: #aaa;
+  --color-light--2: #ececec;
+  --color-light--3: rgb(214, 222, 224);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  font-size: 62.5%;
+  box-sizing: border-box;
+}
+
+.app {
+  font-family: 'Manrope', sans-serif;
+  color: var(--color-light--2);
+  font-weight: 400;
+  line-height: 1.6;
+  height: 100vh;
+  overscroll-behavior-y: none;
+
+  background-color: #fff;
+  padding: 2.5rem;
+
+  display: flex;
+}
+
+/* GENERAL */
+a:link,
+a:visited {
+  color: var(--color-brand--1);
+}
+
+/* SIDEBAR */
+.sidebar {
+  flex-basis: 50rem;
+  background-color: var(--color-dark--1);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  height: 5.2rem;
+  align-self: center;
+  margin-bottom: 4rem;
+}
+
+.workouts {
+  list-style: none;
+  height: 77vh;
+  padding: 0 15px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.workouts::-webkit-scrollbar {
+  width: 0;
+}
+
+.workouts__toolbox {
+  margin-bottom: 15px;
+}
+
+input,
+select,
+button {
+  padding: 8px 12px;
+  border-radius: 3px;
+  border: none;
+  outline: none;
+}
+
+.workout {
+  background-color: var(--color-dark--2);
+  border-radius: 5px;
+  padding: 1.5rem 2.25rem;
+  margin-bottom: 1.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+}
+.workout--running {
+  border-left: 5px solid var(--color-brand--2);
+}
+.workout--cycling {
+  border-left: 5px solid var(--color-brand--1);
+}
+
+.workout__toolbox {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.workout__edit {
+  margin-right: 10px;
+}
+
+.workout__title {
+  font-size: 1.7rem;
+  font-weight: 600;
+  grid-column: 1 / 4;
+}
+
+.workout__details {
+  display: flex;
+  align-items: baseline;
+}
+
+.workout__icon {
+  font-size: 1.8rem;
+  margin-right: 0.2rem;
+  height: 0.28rem;
+}
+
+.workout__value {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.workout__unit {
+  font-size: 1.1rem;
+  color: var(--color-light--1);
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.form {
+  background-color: var(--color-dark--2);
+  border-radius: 5px;
+  padding: 1.5rem 2.75rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2.5rem;
+
+  /* Match height and activity boxes */
+  height: 9.25rem;
+  transition: all 0.5s, transform 1ms;
+}
+
+.form.hidden {
+  transform: translateY(-30rem);
+  height: 0;
+  padding: 0 2.25rem;
+  margin-bottom: 0;
+  opacity: 0;
+}
+
+.form__row {
+  display: flex;
+  align-items: center;
+}
+
+.form__row--hidden {
+  display: none;
+}
+
+.form__label {
+  flex: 0 0 45%;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.form__input {
+  width: 100%;
+  padding: 0.3rem 1.1rem;
+  font-family: inherit;
+  font-size: 1.4rem;
+  border: none;
+  border-radius: 3px;
+  background-color: var(--color-light--3);
+  transition: all 0.2s;
+}
+
+.form__input:focus {
+  outline: none;
+  background-color: #fff;
+}
+
+.form__btn {
+  display: none;
+}
+
+.form__close {
+  font-size: 15px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.copyright {
+  margin-top: auto;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--color-light--1);
+}
+
+.twitter-link:link,
+.twitter-link:visited {
+  color: var(--color-light--1);
+  transition: all 0.2s;
+}
+
+.twitter-link:hover,
+.twitter-link:active {
+  color: var(--color-light--2);
+}
+
+/* MAP */
+#map {
+  flex: 1;
+  height: 100%;
+  background-color: var(--color-light--1);
+}
+
+/* Popup width is defined in JS using options */
+.leaflet-popup .leaflet-popup-content-wrapper {
+  background-color: var(--color-dark--1);
+  color: var(--color-light--2);
+  border-radius: 5px;
+  padding-right: 0.6rem;
+}
+
+.leaflet-popup .leaflet-popup-content {
+  font-size: 1.5rem;
+}
+
+.leaflet-popup .leaflet-popup-tip {
+  background-color: var(--color-dark--1);
+}
+
+.running-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-brand--2);
+}
+.cycling-popup .leaflet-popup-content-wrapper {
+  border-left: 5px solid var(--color-brand--1);
+}
+
+.sort__toolbox {
+  display: flex;
+  align-items: center;
+}
+
+.workout,
+.autocomplete-items div,
+.city-search__button,
+.workouts__delete-all,
+.sort__input,
+.markers__view-all,
+.form__close,
+.sort__reverse {
+  cursor: pointer;
+}
+
+.sort__reverse {
+  font-size: 20px;
+  margin-left: 5px;
+}
+
+.app.hidden,
+.sort__reverse.hidden {
+  visibility: hidden;
+}
+.flip {
+  transform: rotateX(180deg);
+}
+
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+.loader-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-block;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  color: red;
+}
+
+.loader-container.hidden,
+.workouts__toolbox.hidden {
+  display: none;
+}
+
+/* autocomplete styles */
+.autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+}
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 9999;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+.autocomplete-items div {
+  padding: 10px;
+  border-bottom: 1px solid #d4d4d4;
+  background-color: var(--color-dark--1);
+}
+.autocomplete-active,
+.autocomplete-items div:hover {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important;
+  color: #ffffff;
+}
+
+.flex__space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.city-search__sub-title {
+  margin-bottom: 10px;
+}
+
+.workouts__confirmation-message {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+button[disabled],
+select[disabled] {
+  cursor: initial;
+}
+
+.small-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
