@@ -1,4 +1,4 @@
-@import './node_modules/leaflet/dist/leaflet.css';
+@import '../node_modules/leaflet/dist/leaflet.css';
 
 :root {
   --color-brand--1: #ffb545;
@@ -44,7 +44,7 @@ a:visited {
 
 /* SIDEBAR */
 .sidebar {
-  flex-basis: 50rem;
+  flex-basis: 52rem;
   background-color: var(--color-dark--1);
   padding: 3rem;
   display: flex;
