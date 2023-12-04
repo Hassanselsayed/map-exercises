@@ -8,7 +8,7 @@ import {
 } from './helpers.js';
 
 // 3rd party modules
-import '../node_modules/leaflet/dist/leaflet.js';
+import './node_modules/leaflet/dist/leaflet.js';
 
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
