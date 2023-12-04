@@ -2,7 +2,6 @@
   "name": "map-exercises",
   "version": "1.0.0",
   "description": "a web app to log your exercises onto a list and a map ",
-  "main": "script.js",
   "scripts": {
     "serve": "live-server"
   },
@@ -23,5 +22,6 @@
   "homepage": "https://github.com/Hassanselsayed/map-exercises#readme",
   "dependencies": {
     "leaflet": "^1.9.4"
-  }
+  },
+  "devDependencies": {}
 }
