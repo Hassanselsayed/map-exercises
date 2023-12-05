@@ -44,9 +44,9 @@ a:visited {
 
 /* SIDEBAR */
 .sidebar {
-  flex-basis: 52rem;
+  flex-basis: 48rem;
   background-color: var(--color-dark--1);
-  padding: 3rem;
+  padding: 3rem 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -345,6 +345,10 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.city-search__title {
+  font-size: 14px;
 }
 .city-search__sub-title {
   margin-bottom: 10px;

@@ -29,4 +29,4 @@ Figrure 2 shows the flowchart of the complete functionalities developed by Jonas
 </figure>
 
 To compare between the course project and my updated version of the project, please go to the following links:
-[Course project](https://mapty.netlify.app/) vs [My updated project]()
+[Course project](https://mapty.netlify.app/) vs [My updated project](https://hassanselsayed.github.io/map-exercises/)
