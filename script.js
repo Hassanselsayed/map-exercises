@@ -5,6 +5,7 @@ import {
   disableButton,
   removeElement,
   showElement,
+  hideElement,
 } from './helpers.js';
 
 // 3rd party modules
@@ -18,6 +19,7 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const closeForm = document.querySelector('.form__close');
+const errorForm = document.querySelector('.form__error');
 const deleteAll = document.querySelector('.workouts__delete-all');
 const inputSort = document.querySelector('.sort__input');
 const reverseSort = document.querySelector('.sort__reverse');
@@ -289,14 +291,22 @@ class App {
 
     // Change UI
 
-    showElement(appEl);
     removeElement(loaderEl);
+    showElement(appEl);
     showElement(workoutsToolbox);
+    showElement(document.querySelector('.info-circle'));
 
     this.#map.setView(coords, this.#mapZoomLevel);
   }
 
   #showForm(mapE) {
+    inputType.value = 'running';
+    hideElement(errorForm);
+    if (
+      inputCadence.closest('.form__row').className.includes('form__row--hidden')
+    )
+      this.#toggleElevationFeild();
+
     if (mapE) {
       this.#mapEvent = mapE;
     }
@@ -319,8 +329,8 @@ class App {
   }
 
   #toggleElevationFeild() {
-    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
   async #newWorkout(e) {
@@ -348,7 +358,8 @@ class App {
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       ) {
-        return alert('Inputs have to be positive numbers!');
+        showElement(errorForm);
+        return;
       }
 
       workout = new Running(
@@ -367,9 +378,10 @@ class App {
       // check if data is valid
       if (
         !validInputs(distance, duration, elevation) ||
-        !allPositive(distance, duration)
+        !allPositive(distance, duration, elevation)
       ) {
-        return alert('Inputs have to be positive numbers!');
+        showElement(errorForm);
+        return;
       }
 
       workout = new Cycling(

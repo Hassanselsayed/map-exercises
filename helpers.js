@@ -13,3 +13,7 @@ export function removeElement(el) {
 export function showElement(el) {
   el.classList.remove('hidden');
 }
+
+export function hideElement(el) {
+  el.classList.add('hidden');
+}
