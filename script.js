@@ -139,9 +139,12 @@ class App {
     if (screen.width <= 1000) {
       removeElement(loaderEl);
       removeElement(appEl);
-      showElement(smallScreenEl);
       return;
     }
+
+    // remove screen size prompt
+    removeElement(smallScreenEl);
+
     // Get user's position
     await this.#getPosition();
   }
