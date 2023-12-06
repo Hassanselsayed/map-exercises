@@ -302,11 +302,14 @@ button {
   height: 120px;
   animation: spin 2s linear infinite;
 }
-.loader-container {
+.page-load__container {
   position: absolute;
   top: 50%;
   left: 50%;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   transform: translate(-50%, -50%);
 }
 
@@ -323,7 +326,7 @@ button {
   color: red;
 }
 
-.loader-container.hidden,
+.page-load__container.hidden,
 .form__row--hidden,
 .form__error.hidden,
 .info-circle.hidden,

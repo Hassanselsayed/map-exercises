@@ -25,7 +25,7 @@ const inputSort = document.querySelector('.sort__input');
 const reverseSort = document.querySelector('.sort__reverse');
 const viewAll = document.querySelector('.markers__view-all');
 const appEl = document.querySelector('.app');
-const loaderEl = document.querySelector('.loader-container');
+const loaderEl = document.querySelector('.page-load__container');
 const workoutsToolbox = document.querySelector('.workouts__toolbox');
 const smallScreenEl = document.querySelector('.small-screen');
 
@@ -138,7 +138,7 @@ class App {
   }
 
   async init() {
-    if (screen.width <= 1000) {
+    if (window.innerWidth <= 1000) {
       removeElement(loaderEl);
       removeElement(appEl);
       return;
@@ -454,7 +454,7 @@ class App {
     // enable toolbox buttons
     enableButton(deleteAll);
     enableButton(viewAll);
-    enableButton(inputSort);
+    if (this.#workouts.length > 1) enableButton(inputSort);
 
     let html = `
       <li class="workout workout--${workout.type}" id="${
