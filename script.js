@@ -1,13 +1,6 @@
 // local modules
 import autocomplete from './autocomplete.js';
-import {
-  enableButton,
-  disableButton,
-  removeElement,
-  showElement,
-  hideElement,
-  timeout
-} from './helpers.js';
+import { enableButton, disableButton, removeElement, showElement, hideElement, getJSON } from './helpers.js';
 
 // 3rd party modules
 import './node_modules/leaflet/dist/leaflet.js';
@@ -44,41 +37,17 @@ class Workout {
   }
 
   async setDescription() {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     try {
       const [lat, lng] = this.coords;
-      // TODO: const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
-      const resGeo = await fetch(
-        `https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`
-      );
-      const data = await resGeo.json();
-      if (!resGeo.ok || !data.city)
-        throw new Error(
-          `Couldn't get location data because of API calls limit`
-        );
-      this.description = `${this.type[0].toUpperCase()}${this.type.slice(
-        1
-      )} in ${data.city}, ${data.state ? data.state : data.region} on ${
-        months[this.date.getMonth()]
-      } ${this.date.getDate()}`;
+      const data = await getJSON(`https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`);
+
+      if (!data.city) throw new Error(`Couldn't get location data because of API calls limit`);
+
+      this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} in ${data.city}, ${data.state ? data.state : data.region} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
     } catch (err) {
-      this.description = `${this.type[0].toUpperCase()}${this.type.slice(
-        1
-      )} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+      this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
     }
   }
 }
@@ -195,26 +164,24 @@ class App {
     autocomplete(document.getElementById('myInput'), this.#citySuggestions);
 
     // attach event listener to city search form
-    document
-      .querySelector('.city-search__form')
-      .addEventListener('submit', this.#searchForCity.bind(this));
+    document.querySelector('.city-search__form').addEventListener('submit', this.#searchForCity.bind(this));
   }
 
   async #getAllCities() {
     // get all countries
-    // TODO: add try/catch
-    // TODO: const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
-    const allCountries = await fetch(
-      'https://countriesnow.space/api/v0.1/countries'
-    );
-    const countries = (await allCountries.json()).data;
+    try {
+      const { data } = await getJSON('https://countriesnow.space/api/v0.1/countries');
 
-    // create an array of `city, country` strings to be used for autocomplete suggestions
-    countries.forEach(co =>
-      co.cities.forEach(city =>
-        this.#citySuggestions.push(`${city}, ${co.iso2}`)
-      )
-    );
+      // create an array of `city, country` strings to be used for autocomplete suggestions
+      data.forEach(co => co.cities.forEach(city => this.#citySuggestions.push(`${city}, ${co.iso2}`)));
+    } catch (err) {
+      removeElement(document.querySelector('.city-search'));
+
+      const markup = `
+        <h2>There's an issue with the City Search API. Please reload the page and allow location access.</h2>
+      `;
+      containerWorkouts.insertAdjacentHTML('beforebegin', markup);
+    }
   }
 
   async #searchForCity(e) {
@@ -239,15 +206,8 @@ class App {
     const citySearchEl = document.querySelector('.city-search');
 
     try {
-      // TODO: const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
-      const response = await fetch(url, options);
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(
-          `Sorry couldn't get city details, API calls limit reached. Please refresh page and allow location access to use the app.`
-        );
-      if (result.length === 0)
-        throw new Error(`Sorry couldn't find city, please choose another one.`);
+      const result = await getJSON(url, options);
+      if (result.length === 0) throw new Error(`Sorry couldn't find city, please choose another one. If you've chosen a popular city (like Toronto, CA) and still got this error, then the API calls limit must've been reached. Please refresh the page and allow location access to continue using the app.`);
 
       await this.#loadMap({
         coords: {
@@ -283,8 +243,7 @@ class App {
     this.#map = L.map('map', { zoomSnap: 0.1 });
 
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
     // handling clicks on map
@@ -306,10 +265,7 @@ class App {
   #showForm(mapE) {
     inputType.value = 'running';
     hideElement(errorForm);
-    if (
-      inputCadence.closest('.form__row').className.includes('form__row--hidden')
-    )
-      this.#toggleElevationFeild();
+    if (inputCadence.closest('.form__row').className.includes('form__row--hidden')) this.#toggleElevationFeild();
 
     if (mapE) {
       this.#mapEvent = mapE;
@@ -320,11 +276,7 @@ class App {
 
   #hideForm() {
     // Empty inputs
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
+    inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';
     form.style.display = 'none';
     form.classList.add('hidden');
     setTimeout(() => {
@@ -339,8 +291,7 @@ class App {
 
   async #newWorkout(e) {
     // validate input data
-    const validInputs = (...inputs) =>
-      inputs.every(input => Number.isFinite(input));
+    const validInputs = (...inputs) => inputs.every(input => Number.isFinite(input));
     const allPositive = (...inputs) => inputs.every(input => input > 0);
     e.preventDefault();
 
@@ -358,44 +309,24 @@ class App {
     if (type === 'running') {
       const cadence = +inputCadence.value;
       // check if data is valid
-      if (
-        !validInputs(distance, duration, cadence) ||
-        !allPositive(distance, duration, cadence)
-      ) {
+      if (!validInputs(distance, duration, cadence) || !allPositive(distance, duration, cadence)) {
         showElement(errorForm);
         return;
       }
 
-      workout = new Running(
-        [lat, lng],
-        distance,
-        duration,
-        currentDate,
-        id,
-        cadence
-      );
+      workout = new Running([lat, lng], distance, duration, currentDate, id, cadence);
     }
 
     // if workout is cycling, create cycling object
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
       // check if data is valid
-      if (
-        !validInputs(distance, duration, elevation) ||
-        !allPositive(distance, duration, elevation)
-      ) {
+      if (!validInputs(distance, duration, elevation) || !allPositive(distance, duration, elevation)) {
         showElement(errorForm);
         return;
       }
 
-      workout = new Cycling(
-        [lat, lng],
-        distance,
-        duration,
-        currentDate,
-        id,
-        elevation
-      );
+      workout = new Cycling([lat, lng], distance, duration, currentDate, id, elevation);
     }
 
     await workout.init();
@@ -426,11 +357,7 @@ class App {
 
   #editWorkoutMarker(workout) {
     this.#map.eachLayer(layer => {
-      if (
-        layer._latlng &&
-        layer._latlng.lat === workout.coords[0] &&
-        layer._latlng.lng === workout.coords[1]
-      ) {
+      if (layer._latlng && layer._latlng.lat === workout.coords[0] && layer._latlng.lng === workout.coords[1]) {
         layer.closePopup();
         this.#addPopup(layer, workout);
       }
@@ -448,9 +375,7 @@ class App {
           className: `${workout.type}-popup`,
         })
       )
-      .setPopupContent(
-        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
-      )
+      .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`)
       .openPopup();
   }
 
@@ -461,22 +386,14 @@ class App {
     if (this.#workouts.length > 1) enableButton(inputSort);
 
     let html = `
-      <li class="workout workout--${workout.type}" id="${
-      workout.id
-    }" data-id="${workout.id}">
+      <li class="workout workout--${workout.type}" id="${workout.id}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
         <div class="workout__toolbox">
-          <i class="fas fa-edit workout__edit" title="Edit workout" id="edit-${
-            workout.id
-          }"></i>
-          <i class="fas fa-trash workout__delete" title="Delete workout" id="delete-${
-            workout.id
-          }"></i>
+          <i class="fas fa-edit workout__edit" title="Edit workout" id="edit-${workout.id}"></i>
+          <i class="fas fa-trash workout__delete" title="Delete workout" id="delete-${workout.id}"></i>
         </div>
         <div class="workout__details">
-          <span class="workout__icon">${
-            workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
-          }</span>
+          <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'}</span>
           <span class="workout__value">${workout.distance}</span>
           <span class="workout__unit">km</span>
         </div>
@@ -519,26 +436,17 @@ class App {
     html += `</li>`;
 
     form.insertAdjacentHTML('afterend', html);
-    document
-      .getElementById(`edit-${workout.id}`)
-      .addEventListener('click', this.#editWorkout.bind(this, workout));
-    document
-      .getElementById(`delete-${workout.id}`)
-      .addEventListener('click', this.#deleteWorkout.bind(this, workout, true));
+    document.getElementById(`edit-${workout.id}`).addEventListener('click', this.#editWorkout.bind(this, workout));
+    document.getElementById(`delete-${workout.id}`).addEventListener('click', this.#deleteWorkout.bind(this, workout, true));
   }
 
   #moveToPopup(e) {
-    if (
-      !e.target.className.includes('edit') &&
-      !e.target.className.includes('delete')
-    ) {
+    if (!e.target.className.includes('edit') && !e.target.className.includes('delete')) {
       const workoutEl = e.target.closest('.workout');
 
       if (!workoutEl) return;
 
-      const workout = this.#workouts.find(
-        workout => workout.id === workoutEl.dataset.id
-      );
+      const workout = this.#workouts.find(workout => workout.id === workoutEl.dataset.id);
 
       this.#map.setView(workout.coords, this.#mapZoomLevel, {
         animate: true,
@@ -563,15 +471,11 @@ class App {
       // toggle between cadence and elevGain
       if (workout.cadence) {
         inputElevation.closest('.form__row').classList.add('form__row--hidden');
-        inputCadence
-          .closest('.form__row')
-          .classList.remove('form__row--hidden');
+        inputCadence.closest('.form__row').classList.remove('form__row--hidden');
         inputCadence.value = workout.cadence;
       }
       if (workout.elevationGain) {
-        inputElevation
-          .closest('.form__row')
-          .classList.remove('form__row--hidden');
+        inputElevation.closest('.form__row').classList.remove('form__row--hidden');
         inputCadence.closest('.form__row').classList.add('form__row--hidden');
         inputElevation.value = workout.elevationGain;
       }
@@ -601,11 +505,7 @@ class App {
     // remove existing map pin
     if (all) {
       this.#map.eachLayer(layer => {
-        if (
-          layer._latlng &&
-          layer._latlng.lat === workout.coords[0] &&
-          layer._latlng.lng === workout.coords[1]
-        ) {
+        if (layer._latlng && layer._latlng.lat === workout.coords[0] && layer._latlng.lng === workout.coords[1]) {
           this.#map.removeLayer(layer);
         }
       });
@@ -663,24 +563,10 @@ class App {
 
       if (wo.type === 'running') {
         const { cadence } = wo;
-        workout = new Running(
-          coords,
-          distance,
-          duration,
-          dateObject,
-          id,
-          cadence
-        );
+        workout = new Running(coords, distance, duration, dateObject, id, cadence);
       } else {
         const { elevationGain } = wo;
-        workout = new Cycling(
-          coords,
-          distance,
-          duration,
-          dateObject,
-          id,
-          elevationGain
-        );
+        workout = new Cycling(coords, distance, duration, dateObject, id, elevationGain);
       }
 
       await workout.init();
