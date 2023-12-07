@@ -6,6 +6,7 @@ import {
   removeElement,
   showElement,
   hideElement,
+  timeout
 } from './helpers.js';
 
 // 3rd party modules
@@ -60,6 +61,7 @@ class Workout {
 
     try {
       const [lat, lng] = this.coords;
+      // TODO: const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
       const resGeo = await fetch(
         `https://geocode.xyz/${lat},${lng}?geoit=json&auth=123490483069106e15888221x102008`
       );
@@ -77,7 +79,6 @@ class Workout {
       this.description = `${this.type[0].toUpperCase()}${this.type.slice(
         1
       )} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
-      console.error(err);
     }
   }
 }
@@ -201,6 +202,8 @@ class App {
 
   async #getAllCities() {
     // get all countries
+    // TODO: add try/catch
+    // TODO: const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
     const allCountries = await fetch(
       'https://countriesnow.space/api/v0.1/countries'
     );
@@ -236,6 +239,7 @@ class App {
     const citySearchEl = document.querySelector('.city-search');
 
     try {
+      // TODO: const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
       const response = await fetch(url, options);
       const result = await response.json();
       if (!response.ok)
@@ -609,10 +613,16 @@ class App {
 
     // reset local storage
     this.#setLocalStorage();
+
+    // disable buttons
+    if (this.#workouts.length === 1) disableButton(inputSort);
+    if (this.#workouts.length === 0) {
+      disableButton(deleteAll);
+      disableButton(viewAll);
+    }
   }
 
   #sortWorkouts() {
-    if (this.#workouts.length === 0) return;
     this.#workouts
       .sort((a, b) => a[inputSort.value] - b[inputSort.value])
       .forEach(workout => {
@@ -625,7 +635,7 @@ class App {
   }
 
   #reverseSorting() {
-    if (this.#workouts.length === 0) return;
+    if (this.#workouts.length <= 1) return;
     if (inputSort.value) {
       this.#workouts.reverse().forEach(workout => {
         removeElement(document.getElementById(workout.id));
