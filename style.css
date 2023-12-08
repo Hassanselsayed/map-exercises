@@ -102,7 +102,7 @@ button {
 }
 
 .workout {
-  background-color: var(--color-dark--2);
+  background-color: black;
   border-radius: 5px;
   padding: 1.5rem 2.25rem;
   margin-bottom: 1.75rem;
@@ -324,6 +324,9 @@ button {
 
 .error {
   color: red;
+  margin: 15px 0;
+  padding: 5px;
+  background: black;
 }
 
 .page-load__container.hidden,
@@ -392,4 +395,8 @@ select[disabled] {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.leaflet-control-container a:link {
+  color: black !important;
 }

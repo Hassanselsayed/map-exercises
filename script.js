@@ -153,7 +153,7 @@ class App {
     `;
 
     // insert html inUI + show/hide relevant elements
-    form.insertAdjacentHTML('afterend', html);
+    form.parentElement.insertAdjacentHTML('afterend', html);
     showElement(appEl);
     removeElement(loaderEl);
 
@@ -435,7 +435,7 @@ class App {
 
     html += `</li>`;
 
-    form.insertAdjacentHTML('afterend', html);
+    form.parentElement.insertAdjacentHTML('afterend', html);
     document.getElementById(`edit-${workout.id}`).addEventListener('click', this.#editWorkout.bind(this, workout));
     document.getElementById(`delete-${workout.id}`).addEventListener('click', this.#deleteWorkout.bind(this, workout, true));
   }

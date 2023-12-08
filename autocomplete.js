@@ -28,8 +28,7 @@ function removeActive(autocompleteItemsElements) {
 
 // a function to rmeove autocomplete list from UI
 function closeAutocompleteList() {
-  const autocompleteItemsElements =
-    document.getElementsByClassName('autocomplete-items');
+  const autocompleteItemsElements = document.getElementsByClassName('autocomplete-items');
 
   for (let i = 0; i < autocompleteItemsElements.length; i++) {
     autocompleteItemsElements[i].remove();
@@ -65,28 +64,21 @@ function autocomplete(inp, arr) {
     // for each item in the array...
     for (let i = 0; i < arr.length; i++) {
       // check if the item starts with the same letters as the text field value:
-      if (
-        this.value.length > 2 &&
-        arr[i].substr(0, this.value.length).toUpperCase() ===
-          this.value.toUpperCase()
-      ) {
+      if (this.value.length > 2 && arr[i].substr(0, this.value.length).toUpperCase() === this.value.toUpperCase()) {
         // create a DIV element for each matching element:
         const autocompleteItem = document.createElement('DIV');
 
         // make the matching letters bold:
-        autocompleteItem.innerHTML =
-          '<strong>' + arr[i].substr(0, this.value.length) + '</strong>';
+        autocompleteItem.innerHTML = '<strong>' + arr[i].substr(0, this.value.length) + '</strong>';
         autocompleteItem.innerHTML += arr[i].substr(this.value.length);
 
         // insert a input field that will hold the current array item's value:
-        autocompleteItem.innerHTML +=
-          "<input type='hidden' value='" + arr[i] + "'>";
+        autocompleteItem.innerHTML += `<input id='autocompleteHidden${i}' type='hidden' value='${arr[i]}'>`;
 
         // execute a function when someone clicks on the item value (DIV element):
         autocompleteItem.addEventListener('click', function (e) {
           // insert the value for the autocomplete text field:
-          inp.value = selectedCity =
-            this.getElementsByTagName('input')[0].value;
+          inp.value = selectedCity = this.getElementsByTagName('input')[0].value;
 
           // enable submit button
           const searchButton = document.querySelector('.city-search__button');
@@ -100,18 +92,11 @@ function autocomplete(inp, arr) {
   });
   // execute a function presses a key on the keyboard:
   inp.addEventListener('keydown', function (e) {
-    let autocompleteItemsElements = document.getElementById(
-      this.id + 'AutocompleteList'
-    );
+    let autocompleteItemsElements = document.getElementById(this.id + 'AutocompleteList');
 
-    if (autocompleteItemsElements)
-      autocompleteItemsElements =
-        autocompleteItemsElements.getElementsByTagName('div');
+    if (autocompleteItemsElements) autocompleteItemsElements = autocompleteItemsElements.getElementsByTagName('div');
 
-    if (
-      e.keyCode === 40 &&
-      currentFocus < autocompleteItemsElements.length - 1
-    ) {
+    if (e.keyCode === 40 && currentFocus < autocompleteItemsElements.length - 1) {
       // if the arrow DOWN key is pressed, increase the currentFocus variable
       currentFocus++;
 

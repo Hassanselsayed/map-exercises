@@ -8,16 +8,10 @@
     <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
 
     <!-- Google fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
     <!-- Font awesome -->
-    <script
-      src="https://kit.fontawesome.com/5356eff725.js"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://kit.fontawesome.com/5356eff725.js" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="style.css" />
     <script defer type="module" src="script.js"></script>
@@ -26,81 +20,47 @@
   <body>
     <div class="app hidden">
       <div class="sidebar">
-        <i
-          class="info-circle fas fa-info-circle hidden"
-          title="Please click anywhere on the map to create a new workout form."
-        ></i>
+        <i class="info-circle fas fa-info-circle hidden" title="Please click anywhere on the map to create a new workout form."></i>
         <ul class="workouts">
           <li class="workouts__toolbox flex__space-between hidden">
             <div class="sort__toolbox">
-              <select class="sort__input" disabled>
+              <select class="sort__input" disabled id="sort" aria-label="sortSelect">
                 <option value="" disabled selected>Sort By</option>
                 <option value="distance">Distance</option>
                 <option value="duration">Duration</option>
               </select>
-              <i
-                class="fas fa-sort-amount-up sort__reverse hidden"
-                title="Reverse sorting direction"
-              ></i>
+              <i class="fas fa-sort-amount-up sort__reverse hidden" title="Reverse sorting direction"></i>
             </div>
-            <button
-              class="workouts__delete-all"
-              title="Delete All Workouts"
-              disabled
-            >
-              Delete All
-            </button>
-            <button class="markers__view-all" title="View All Markers" disabled>
-              View All
-            </button>
+            <button class="workouts__delete-all" title="Delete All Workouts" disabled>Delete All</button>
+            <button class="markers__view-all" title="View All Markers" disabled>View All</button>
           </li>
-          <li>
+          <li class="form__container">
             <form class="form workout__form hidden">
               <div class="form__row">
-                <label class="form__label">Type</label>
-                <select class="form__input form__input--type">
+                <label class="form__label" for="type">Type</label>
+                <select class="form__input form__input--type" id="type">
                   <option value="running">Running</option>
                   <option value="cycling">Cycling</option>
                 </select>
               </div>
               <div class="form__row">
-                <label class="form__label">Distance</label>
-                <input
-                  class="form__input form__input--distance"
-                  placeholder="km"
-                />
+                <label class="form__label" for="distance">Distance</label>
+                <input class="form__input form__input--distance" id="distance" placeholder="km" />
               </div>
               <div class="form__row">
-                <label class="form__label">Duration</label>
-                <input
-                  class="form__input form__input--duration"
-                  placeholder="min"
-                />
+                <label class="form__label" for="duration">Duration</label>
+                <input class="form__input form__input--duration" id="duration" placeholder="min" />
               </div>
               <div class="form__row">
-                <label class="form__label">Cadence</label>
-                <input
-                  class="form__input form__input--cadence"
-                  placeholder="step/min"
-                />
+                <label class="form__label" for="cadence">Cadence</label>
+                <input class="form__input form__input--cadence" id="cadence" placeholder="step/min" />
               </div>
               <div class="form__row form__row--hidden">
-                <label class="form__label">Elev Gain</label>
-                <input
-                  class="form__input form__input--elevation"
-                  placeholder="meters"
-                />
+                <label class="form__label" for="elevation">Elev Gain</label>
+                <input class="form__input form__input--elevation" id="elevation" placeholder="meters" />
               </div>
-              <h3 class="form__error error hidden">
-                * Inputs have to be positive numbers!
-              </h3>
-              <button
-                type="submit"
-                class="form__btn"
-                title="Click (or press enter) to submit workout"
-              >
-                Add workout
-              </button>
+              <h3 class="form__error error hidden">* Inputs have to be positive numbers!</h3>
+              <button type="submit" class="form__btn" title="Click (or press enter) to submit workout">Add workout</button>
               <i class="fas fa-times form__close" title="Close form"></i>
             </form>
           </li>
