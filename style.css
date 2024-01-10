@@ -36,6 +36,18 @@ html {
   display: flex;
 }
 
+@media (min-width: 1000px) {
+  .small-screen {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .app {
+    display: none !important;
+  }
+}
+
 /* GENERAL */
 a:link,
 a:visited {

@@ -21,7 +21,6 @@ const viewAll = document.querySelector('.markers__view-all');
 const appEl = document.querySelector('.app');
 const loaderEl = document.querySelector('.page-load__container');
 const workoutsToolbox = document.querySelector('.workouts__toolbox');
-const smallScreenEl = document.querySelector('.small-screen');
 
 class Workout {
   constructor(coords, distance, duration, date, id) {
@@ -108,15 +107,6 @@ class App {
   }
 
   async init() {
-    if (window.innerWidth <= 1000) {
-      removeElement(loaderEl);
-      removeElement(appEl);
-      return;
-    }
-
-    // remove screen size prompt
-    removeElement(smallScreenEl);
-
     // Get user's position
     await this.#getPosition();
   }
