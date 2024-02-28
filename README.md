@@ -1,3 +1,5 @@
+### [Site Link](https://hassanselsayed.github.io/map-exercises/)
+
 This project was primarily developed during a JavaScript course I took with [Jonas Schmedtmann](https://twitter.com/jonasschmedtman). He designed the project and I coded along with him during the course. Figure 1 shows the flowchart of what exactly was developed during the course.
 
 <figure>
